@@ -5,4 +5,4 @@ allowed-tools: Bash(bash:*)
 
 !`bash "${CLAUDE_PLUGIN_ROOT}/scripts/launch.sh" 2>&1`
 
-Tell the user in one line that OpenWhip is running in the menu bar / system tray. On macOS, mention it needs Accessibility permission for the terminal/Electron to send keystrokes.
+Tell the user in one line that OpenWhip is running in the menu bar / system tray. On macOS, if a "would like to control this computer" prompt appeared, tell them to click Open System Settings and switch it on; until then cracks type nothing.

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, screen } = require('electron');
+const { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, screen, systemPreferences } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -279,6 +279,9 @@ function sendMacroLinux(text) {
 if (!app.requestSingleInstanceLock()) app.exit();
 
 app.whenReady().then(async () => {
+  // Shows the macOS "control this computer" prompt once; without it the crack keystrokes are silently dropped.
+  if (process.platform === 'darwin') systemPreferences.isTrustedAccessibilityClient(true);
+
   tray = new Tray(await getTrayIcon());
   tray.setToolTip('OpenWhip - click for whip');
   tray.setContextMenu(

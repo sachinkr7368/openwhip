@@ -37,7 +37,7 @@ cd openwhip && npm ci && npm start
 
 ## Platform notes
 
-- macOS: grant Accessibility permission (System Settings → Privacy & Security → Accessibility) to Electron, or the keystrokes are silently dropped.
+- macOS: on first launch macOS asks to let OpenWhip control your computer. Click **Open System Settings** and switch it on (Privacy & Security → Accessibility; it may be listed as Electron or as your terminal app). Apple only lets you flip this switch yourself. Until you do, the whip swings but types nothing.
 - Linux: install `xdotool` (`sudo apt install xdotool`).
 - Windows: works out of the box.
 
