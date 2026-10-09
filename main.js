@@ -1,7 +1,6 @@
 const { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, screen, systemPreferences } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const os = require('os');
 const { execFile } = require('child_process');
 
 // ── Win32 FFI (Windows only) ────────────────────────────────────────────────
@@ -67,55 +66,30 @@ function createTrayIconFallback() {
   const p = path.join(__dirname, 'icon', 'Template.png');
   if (fs.existsSync(p)) {
     const img = nativeImage.createFromPath(p);
-    if (!img.isEmpty()) {
-      if (process.platform === 'darwin') img.setTemplateImage(true);
-      return img;
-    }
+    if (!img.isEmpty()) return img;
   }
   console.warn('openwhip: icon/Template.png missing or invalid');
   return nativeImage.createEmpty();
 }
 
-async function tryIcnsTrayImage(icnsPath) {
-  const size = { width: 64, height: 64 };
-  const thumb = await nativeImage.createThumbnailFromPath(icnsPath, size);
-  if (!thumb.isEmpty()) return thumb;
-  return null;
+// macOS hides status items that don't fit beside the notch, so the 512px source
+// must be shrunk to the standard 18pt (36px @2x) template icon.
+function createMacTrayIcon() {
+  const src = createTrayIconFallback();
+  if (src.isEmpty()) return src;
+  const img = nativeImage.createFromBuffer(src.resize({ width: 36, height: 36 }).toPNG(), { scaleFactor: 2 });
+  img.setTemplateImage(true);
+  return img;
 }
 
-// macOS: createFromPath does not decode .icns (Electron only loads PNG/JPEG there, ICO on Windows).
-// Quick Look thumbnails handle .icns; copy to temp if the file is inside ASAR (QL needs a real path).
-async function getTrayIcon() {
-  const iconDir = path.join(__dirname, 'icon');
+function getTrayIcon() {
+  if (process.platform === 'darwin') return createMacTrayIcon();
   if (process.platform === 'win32') {
-    const file = path.join(iconDir, 'icon.ico');
+    const file = path.join(__dirname, 'icon', 'icon.ico');
     if (fs.existsSync(file)) {
       const img = nativeImage.createFromPath(file);
       if (!img.isEmpty()) return img;
     }
-    return createTrayIconFallback();
-  }
-  if (process.platform === 'darwin') {
-    const file = path.join(iconDir, 'AppIcon.icns');
-    if (fs.existsSync(file)) {
-      const fromPath = nativeImage.createFromPath(file);
-      if (!fromPath.isEmpty()) return fromPath;
-      try {
-        const t = await tryIcnsTrayImage(file);
-        if (t) return t;
-      } catch (e) {
-        console.warn('AppIcon.icns Quick Look thumbnail failed:', e?.message || e);
-      }
-      const tmp = path.join(os.tmpdir(), 'openwhip-tray.icns');
-      try {
-        fs.copyFileSync(file, tmp);
-        const t = await tryIcnsTrayImage(tmp);
-        if (t) return t;
-      } catch (e) {
-        console.warn('AppIcon.icns temp copy + thumbnail failed:', e?.message || e);
-      }
-    }
-    return createTrayIconFallback();
   }
   return createTrayIconFallback();
 }
@@ -282,7 +256,7 @@ app.whenReady().then(async () => {
   // Shows the macOS "control this computer" prompt once; without it the crack keystrokes are silently dropped.
   if (process.platform === 'darwin') systemPreferences.isTrustedAccessibilityClient(true);
 
-  tray = new Tray(await getTrayIcon());
+  tray = new Tray(getTrayIcon());
   tray.setToolTip('OpenWhip - click for whip');
   tray.setContextMenu(
     Menu.buildFromTemplate([
