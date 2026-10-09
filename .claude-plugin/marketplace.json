@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "openwhip",
+  "description": "Whip Claude into shape.",
+  "owner": {
+    "name": "Sachin",
+    "url": "https://github.com/sachinkr7368"
+  },
+  "plugins": [
+    {
+      "name": "openwhip",
+      "description": "Crack a whip on screen to interrupt Claude Code and tell it to go faster.",
+      "source": "./",
+      "category": "fun"
+    }
+  ]
+}

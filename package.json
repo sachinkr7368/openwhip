@@ -1,12 +1,15 @@
 {
   "name": "openwhip",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Whip Claude into shape",
   "license": "MIT",
+  "author": "Sachin (https://github.com/sachinkr7368)",
+  "contributors": [
+    "GitFrog1111 (https://github.com/GitFrog1111)"
+  ],
   "main": "main.js",
   "bin": {
-    "openwhip": "bin/openwhip.js",
-    "badclaude": "bin/openwhip.js"
+    "openwhip": "bin/openwhip.js"
   },
   "os": [
     "darwin",
@@ -20,16 +23,18 @@
     "electron",
     "tray",
     "overlay",
-    "cli"
+    "cli",
+    "claude-code",
+    "claude-code-plugin"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GitFrog1111/OpenWhip.git"
+    "url": "git+https://github.com/sachinkr7368/openwhip.git"
   },
   "bugs": {
-    "url": "https://github.com/GitFrog1111/OpenWhip/issues"
+    "url": "https://github.com/sachinkr7368/openwhip/issues"
   },
-  "homepage": "https://github.com/GitFrog1111/OpenWhip#readme",
+  "homepage": "https://github.com/sachinkr7368/openwhip#readme",
   "files": [
     "main.js",
     "preload.js",
@@ -37,8 +42,8 @@
     "sounds",
     "icon",
     "bin/openwhip.js",
-    "bin/badclaude.js",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "start": "electron .",
