@@ -72,18 +72,9 @@ function createTrayIconFallback() {
   return nativeImage.createEmpty();
 }
 
-// macOS hides status items that don't fit beside the notch, so the 512px source
-// must be shrunk to the standard 18pt (36px @2x) template icon.
-function createMacTrayIcon() {
-  const src = createTrayIconFallback();
-  if (src.isEmpty()) return src;
-  const img = nativeImage.createFromBuffer(src.resize({ width: 36, height: 36 }).toPNG(), { scaleFactor: 2 });
-  img.setTemplateImage(true);
-  return img;
-}
-
 function getTrayIcon() {
-  if (process.platform === 'darwin') return createMacTrayIcon();
+  // The 'Template' suffix makes macOS tint it for light/dark menu bars; @2x is picked up automatically.
+  if (process.platform === 'darwin') return nativeImage.createFromPath(path.join(__dirname, 'icon', 'trayTemplate.png'));
   if (process.platform === 'win32') {
     const file = path.join(__dirname, 'icon', 'icon.ico');
     if (fs.existsSync(file)) {
@@ -258,11 +249,12 @@ app.whenReady().then(async () => {
 
   tray = new Tray(getTrayIcon());
   tray.setToolTip('OpenWhip - click for whip');
-  tray.setContextMenu(
-    Menu.buildFromTemplate([
-      { label: 'Quit', click: () => app.quit() },
-    ])
-  );
+  const menu = Menu.buildFromTemplate([
+    { label: 'Quit', click: () => app.quit() },
+  ]);
+  // On macOS a context menu swallows left clicks, so keep it on right-click only.
+  if (process.platform === 'darwin') tray.on('right-click', () => tray.popUpContextMenu(menu));
+  else tray.setContextMenu(menu);
   tray.on('click', toggleOverlay);
 });
 
