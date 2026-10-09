@@ -276,6 +276,8 @@ function sendMacroLinux(text) {
 }
 
 // ── App lifecycle ───────────────────────────────────────────────────────────
+if (!app.requestSingleInstanceLock()) app.exit();
+
 app.whenReady().then(async () => {
   tray = new Tray(await getTrayIcon());
   tray.setToolTip('OpenWhip - click for whip');
